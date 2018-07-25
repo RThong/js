@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script>
+;(function (){
+
+let successCb, failCb, nextPromise
+
+function resolve(val) {
+	setTimeout(() => {
+		if(this.nowStatus === 'pending'){
+			this.nowStatus = 'resolved'
+			this.promiseValue = val
+			// console.log('resolved!!!!')
+			successCb(this.promiseValue)
+		}
+	}, 0)
+}
+function reject(val) {
+	setTimeout(() => {
+		if(this.nowStatus === 'pending'){
+			this.nowStatus = 'rejected'
+			this.promiseValue = val
+			// console.log('rejected!!!!')
+			try{
+				throw this.promiseValue
+			}catch(err) {		
+				failCb(err)
+			}
+		}
+	}, 0)
+}
+
+function fakePromise(cb) {
+  this.nowStatus = 'pending'
+  this.promiseValue = undefined
+  try {
+		cb.call(undefined, resolve.bind(this), reject.bind(this)) 	
+  }catch(err) {
+  	reject.call(this, err)
+  }
+}
+fakePromise.prototype = {
+	then(successFn, failFn) {
+		console.log(this.nowStatus)
+		successCb = successFn
+		failCb = failFn
+		// nextPromise = new fakePromise((resolve, reject) => {
+		// 	resolve()
+		// })
+		// return nextPromise
+	}
+}
+
+window.fakePromise = fakePromise
+})()
+
+let p = new fakePromise((resolve, reject) => {
+
+	setTimeout(() => {
+		// resolve(2)
+		// console.log(a)
+		reject(1)
+		console.log('huidiao')
+	}, 1000)
+})
+p.then(res => {
+	console.log('resolve 1')
+	console.log(res)
+}, res => {
+	console.log('reject 1')
+	console.log(res)
+})
+	// .then(res => {
+	// 	console.log('resolve 2')
+	// 	console.log(res)
+	// }, res => {
+	// 	console.log('reject 2')
+	// 	console.log(res)
+	// })
+
+console.dir(p)
+
+
+	</script>
+</body>
+</html>
+
