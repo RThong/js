@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script>
+		//关键是只让子类的实例能访问到父类原型对象上的方法，所以需要让子类的原型对象指向父类的原型对象
+		//Object.create方法会返回新的函数并指向参数函数，所以要先使用再定义子类自己的方法
+		function Animal(options) {
+			this.name = options.name
+		}
+		Animal.prototype.eat = function() {
+			console.log(this.name+'会吃')
+		}
+
+		function Dog(options) {
+			Animal.call(this, options)//定义this,传入参数定义新的自有属性
+		}
+		Dog.prototype = Object.create(Animal.prototype)
+		Dog.prototype.jiao = function() {
+			console.log(this.name+'汪汪汪')
+		}
+		Dog.prototype.constructor = Dog
+
+		let dog = new Dog({name: '旺财'})
+		console.dir(dog)
+		dog.jiao()
+		dog.eat()
+
+		function Cat(options) {
+			Animal.call(this, options)
+		}
+
+		Cat.prototype = Object.create(Animal.prototype)
+		Cat.prototype.jiao = function() {
+			console.log(this.name+'喵喵喵')
+		}
+		Cat.prototype.constructor = Cat
+
+		let cat = new Cat({name: '招财'})
+		console.dir(cat)
+		cat.jiao()
+		cat.eat()
+
+		let ins = new Animal({name: '人类'})
+
+		ins.eat()
+	</script>
+</body>
+</html>

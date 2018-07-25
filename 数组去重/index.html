@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script>
+		var ar = [1,23,1,1,1,3,23,5,6,7,9,9,8,5];
+
+    function quchong(arr) {
+    	let result = []
+    	for(let i = 0;i < arr.length;i++) {
+    		if(arr.indexOf(arr[i]) === i){
+    			result.push(arr[i])
+    		}
+    	}
+    	return result
+    }
+    console.log(Array.from(new Set(ar)))
+    console.log(quchong(ar))
+	</script>
+</body>
+</html>

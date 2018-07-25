@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script>
+		//super要在使用this之前，entends 自动将子类原型的原型指向父类原型， 原型的constructor也指定好了
+		class Animal{
+			constructor(options) {
+				this.name = options.name
+			}
+			eat() {
+				console.log(`${this.name}会吃`)
+			}
+		}
+
+		class Dog extends Animal{
+			constructor(options) {
+				super({name: options.name})
+				this.weight = options.weight
+			}
+			jiao() {
+				console.log(`${this.name}汪汪汪`)
+			}
+		}
+
+		class Cat extends Animal{
+			constructor(options) {
+				super({name: options.name})
+				this.weight = options.weight
+			}
+			jiao() {
+				console.log(`${this.name}喵喵喵`)
+			}
+		}
+		let ani = new Animal({name: '动物'})
+		ani.eat()
+
+		let dog = new Dog({name: '旺财'})
+		console.log(dog)
+		dog.eat()
+		dog.jiao()
+
+		let cat = new Cat({name: '招财'})
+		console.log(cat)
+		cat.eat()
+		cat.jiao()
+
+	</script>
+</body>
+</html>
