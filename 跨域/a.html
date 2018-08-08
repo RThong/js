@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<iframe src="http://localhost:8080/b.html" id="ifr">
+	</iframe>
+	<script>
+		window.onload = function(){
+			var iframe = document.getElementById('ifr');
+
+  		var targetOrigin = 'http://localhost:8080'; // 若写成'http://b.com/c/proxy.html'效果一样
+                                        // 若写成'http://c.com'就不会执行postMessage了
+                                        //iframe.contentWindow接收方的window对象，参数1是传递的数据，参数2是接收方的域
+      iframe.contentWindow.postMessage('data to send',targetOrigin);
+    }
+  </script>
+</body>
+</html>

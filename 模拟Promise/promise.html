@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>模拟Promise</title>
+</head>
+<body>
+	<script>
+		function MyPromise(executor) {
+		  var self = this
+		  self.status = 'pending' // Promise当前的状态
+		  self.data = undefined  // Promise的值
+		  self.onResolvedCallback = [] // Promise resolve时的回调函数集，因为在Promise结束之前有可能有多个回调添加到它上面
+		  self.onRejectedCallback = [] // Promise reject时的回调函数集，因为在Promise结束之前有可能有多个回调添加到它上面
+
+		  try { // 捕获executor中的同步错误，并立即将promise状态改为rejected，
+		    executor(resolve, reject) // 执行executor
+		  } catch(e) {
+		    reject(e)
+		  }
+
+		  function resolve(value) {
+		  	console.log(value)
+		  	if(value instanceof MyPromise || value instanceof Promise) {
+		  		return value.then(resolve, reject)
+		  	}
+		  	setTimeout(() => {
+		  		//只在状态为pending时执行
+		  		if (self.status === 'pending') {
+		  			self.status = 'resolved'
+		  			self.data = value
+		  			for(var i = 0; i < self.onResolvedCallback.length; i++) {
+		  				self.onResolvedCallback[i](value)
+		  			}
+		  		}
+		  	})	  	
+		  }
+
+		  function reject(reason) {
+		  	setTimeout(() => {
+		  		if (self.status === 'pending') {
+		  			self.status = 'rejected'
+		  			self.data = reason
+		  			for(var i = 0; i < self.onRejectedCallback.length; i++) {
+		  				self.onRejectedCallback[i](reason)
+		  			}
+		  		}
+		  	})
+		  }
+		}
+
+		MyPromise.prototype.then = function(onResolved, onRejected) {
+			console.log('then')
+		  var self = this
+
+		  // 根据标准，如果then的参数不是function，则我们需要忽略它，此处以如下方式处理
+		  onResolved = typeof onResolved === 'function' ? onResolved : val => val
+		  onRejected = typeof onRejected === 'function' ? onRejected : reason => reason
+
+		  return new MyPromise(function(resolve, reject) {
+		  	//同步的将成功回调和失败回调添加到上一轮的promise实例中,通过resolve或者reject方法去执行，resolve和reject是异步的（push发生在then()调用，为push的回调在上一轮的resolve或reject执行）
+		  	self.onResolvedCallback.push(function(value) {
+		  		try {
+		  			var x = onResolved(self.data)
+		  			//尝试将MyPromise和Promise混用
+		  			if (x instanceof MyPromise || x instanceof Promise) {
+		  				//如果是then显式返回的是Promise实例，则将这个promise的结果返回给本轮promise的结果
+		  				x.then(resolve, reject)
+		  			}else{
+		  				//否则将本轮promise状态立即变成resolve，值为成功回调的返回值
+		  				resolve(x)
+		  			}
+		  		} catch (e) {
+		  			reject(e)
+		  		}
+		  	})
+
+		  	self.onRejectedCallback.push(function(reason) {
+		  		try {
+		  			var x = onRejected(self.data)
+		  			if (x instanceof MyPromise) {
+		  				x.then(resolve, reject)
+		  			}else{
+		  				resolve(x)
+		  			}
+		  		} catch (e) {
+		  			reject(e)
+		  		}
+		  	})
+		  })
+		}
+
+		function fn() {
+			return new MyPromise((resolve, reject) => {
+				setTimeout(() => {
+					resolve('第一个promise')
+				}, 3000)
+					
+			})
+		}
+
+		new MyPromise((resolve, reject) => {
+			setTimeout(() => {	
+				resolve(Promise.resolve('第一个promise'))
+			},1000)
+		})
+		// .then()
+			.then(res => {
+				console.log('resolve 1')
+				console.log(res)
+				return Promise.resolve('第二个promise')
+			}, res => {
+				console.log('reject 1')
+				console.log(res)
+			})
+			.then(res => {
+				console.log('resolve 2')
+				console.log(res)
+			}, res => {
+				console.log('reject 2')
+				console.log(res)
+			})
+
+			console.log('outer')
+	</script>
+</body>
+</html>

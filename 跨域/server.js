@@ -13,7 +13,7 @@ var http = require('http');
 http.createServer(function(request, response){
     response.writeHead(200, {
     	'Content-Type': 'application/x-javascript',
-    	'Access-Control-Allow-Origin': 'http://localhost:8080'
+    	'Access-Control-Allow-Origin': '*'
     });
     // const data = {name: "hong"}
     response.end('!!!!!!!');
