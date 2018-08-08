@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+</head>
+<body>
+  <div style="background: blue;width: 200px;height: 200px;"></div>
+  <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+  <script>
+    class Event {
+      constructor(){
+        this.eventList = {};
+      }
+      listen(key, fn){
+        if(!fn || typeof fn !== "function"){
+          console.log('回调不是函数')
+          return false;
+        }
+        if (!this.eventList[key]) {
+            this.eventList[key] = [];
+        }
+        this.eventList[key].push(fn);//为了在触发事件后在不同的地方执行不同的回调
+      }
+      trigger(eventName,...rest){
+        if(!this.eventList[eventName]){
+          return false;
+        }
+        this.eventList[eventName].forEach((fn)=>{
+            fn.apply(this, rest);
+        })
+      }
+    }
+
+    let event = new Event();
+
+    event.listen('login',()=>{
+      $('div').css('background','green')
+    })
+    event.listen('login', ()=>{
+      alert('这里是登录回调')
+    })
+
+    
+    $('div').on('click', function(){
+      setTimeout(()=>{
+        event.trigger('login')
+      },1000)
+    })
+
+  </script>
+</body>
+</html>
