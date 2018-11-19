@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 	<meta charset="UTF-8">
 	<title>Document</title>
 </head>
+
 <body>
 	<div>1</div>
 	<div>2</div>
@@ -12,26 +14,27 @@
 	<div>5</div>
 	<script>
 		//createFunctions只执行一次，只有一份i
-		function createFunctions(){
+		function createFunctions() {
 			var result = new Array();
-			for (var i=0; i < 10; i++){
-				result[i] = function(){
-					return i;
-				};
+			for (var i = 0; i < 10; i++) {
+				result[i] = (function (i) {
+					return () => i
+					// return i;
+				})(i);
 			}
 			return result;
 		}
 		var funcs = createFunctions();
-		for (var i=0; i < funcs.length; i++){
+		for (var i = 0; i < funcs.length; i++) {
 			console.log(funcs[i]());
 		}
-//5个立即执行函数，有5份i，立即执行函数同步执行
-		for(var i = 0;i < 5;i++){
-			document.querySelectorAll('div')[i].onclick = function(j){
+		//5个立即执行函数，有5份i，立即执行函数同步执行
+		for (var i = 0; i < 5; i++) {
+			document.querySelectorAll('div')[i].onclick = function (j) {
 				//立即执行函数传入当前i,闭包是return的函数
-					return function (){
-						console.log(j)
-					}
+				return function () {
+					console.log(j)
+				}
 
 			}(i)
 		}
@@ -39,4 +42,5 @@
 
 	</script>
 </body>
+
 </html>
